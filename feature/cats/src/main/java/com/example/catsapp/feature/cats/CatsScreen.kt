@@ -46,7 +46,7 @@ fun CatsPagingGrid(
     // 화면 방향 감지
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val columnCount = if (isLandscape) 3 else 3
+    val columnCount = if (isLandscape) 3 else 1
     
     Box(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
