@@ -6,6 +6,10 @@ plugins {
 
 android {
     namespace = "com.example.catsapp.core.network"
+
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
