@@ -1,4 +1,4 @@
-package com.example.catsapp.core.domain.model
+package com.example.catsapp.core.model
 
 data class Cat(
     val id: String,

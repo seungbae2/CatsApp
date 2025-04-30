@@ -1,7 +1,7 @@
-package com.example.catsapp.core.domain.repository
+package com.example.catsapp.core.data_api.repository
 
 import com.example.catsapp.core.common.Resource
-import com.example.catsapp.core.domain.model.Cat
+import com.example.catsapp.core.model.Cat
 import kotlinx.coroutines.flow.Flow
 
 interface CatRepository {
