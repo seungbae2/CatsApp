@@ -17,7 +17,7 @@ dependencies {
     api(libs.androidx.compose.material3)
     api(libs.androidx.compose.runtime)
     api(libs.androidx.compose.ui.util)
-    implementation(libs.coil.kt.compose)
+    api(libs.coil.kt.compose)
 
     debugApi(libs.androidx.compose.ui.tooling)
     testImplementation(libs.androidx.compose.ui.test)

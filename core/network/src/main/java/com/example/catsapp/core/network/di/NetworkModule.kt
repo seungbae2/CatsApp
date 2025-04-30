@@ -1,6 +1,7 @@
 package com.example.catsapp.core.network.di
 
 import android.content.Context
+import com.example.catsapp.core.network.BuildConfig
 import com.example.catsapp.core.network.retrofit.CatApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module

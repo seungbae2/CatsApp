@@ -1,7 +1,7 @@
 package com.example.catsapp.core.data.mapper
 
 import com.example.catsapp.core.database.entity.CatEntity
-import com.example.catsapp.core.domain.model.Cat
+import com.example.catsapp.core.model.Cat
 import com.example.catsapp.core.network.response.CatResponse
 
 fun CatEntity.toDomain(): Cat =
