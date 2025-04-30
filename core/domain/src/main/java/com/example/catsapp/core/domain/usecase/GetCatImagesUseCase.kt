@@ -1,5 +1,6 @@
 package com.example.catsapp.core.domain.usecase
 
+import androidx.paging.PagingData
 import com.example.catsapp.core.common.Resource
 import com.example.catsapp.core.model.Cat
 import com.example.catsapp.core.data_api.repository.CatRepository
@@ -9,7 +10,7 @@ import javax.inject.Inject
 class GetCatImagesUseCase @Inject constructor(
     private val repository: CatRepository
 ) {
-    operator fun invoke(limit: Int = 10): Flow<Resource<List<Cat>>> {
-        return repository.getCats(limit)
+    operator fun invoke(pageSize: Int = 10): Flow<PagingData<Cat>> {
+        return repository.getCatsPaging(pageSize)
     }
 }

@@ -3,8 +3,12 @@ package com.example.catsapp.core.data.repository
 import android.net.http.HttpException
 import android.os.Build
 import androidx.annotation.RequiresExtension
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.catsapp.core.common.Resource
 import com.example.catsapp.core.data.mapper.toDomain
+import com.example.catsapp.core.data.paging.CatPagingSource
 import com.example.catsapp.core.data_api.repository.CatRepository
 import com.example.catsapp.core.model.Cat
 import com.example.catsapp.core.network.retrofit.CatApi
@@ -28,5 +32,15 @@ class CatRepositoryImpl @Inject constructor(
         } catch (e: IOException) {
             emit(Resource.Error(e))
         }
+    }
+
+    override fun getCatsPaging(pageSize: Int): Flow<PagingData<Cat>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = pageSize,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { CatPagingSource(api) }
+        ).flow
     }
 }
