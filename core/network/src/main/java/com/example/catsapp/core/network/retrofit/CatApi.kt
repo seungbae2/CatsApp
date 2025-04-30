@@ -1,6 +1,6 @@
 package com.example.catsapp.core.network.retrofit
 
-import Resource
+import com.example.catsapp.core.common.Resource
 import com.example.catsapp.core.network.response.CatResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
