@@ -1,12 +1,11 @@
 package com.example.catsapp.core.network.di
 
-import android.content.Context
+import com.example.catsapp.core.network.BuildConfig
 import com.example.catsapp.core.network.retrofit.CatApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -21,7 +20,7 @@ object NetworkModule {
     // Retrofit
     @Singleton
     @Provides
-    fun provideOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
+    fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(
                 HttpLoggingInterceptor()

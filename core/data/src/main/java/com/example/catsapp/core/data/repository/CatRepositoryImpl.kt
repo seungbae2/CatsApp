@@ -1,5 +1,46 @@
 package com.example.catsapp.core.data.repository
 
-import com.example.catsapp.core.domain.repository.TestRepository
+import android.net.http.HttpException
+import android.os.Build
+import androidx.annotation.RequiresExtension
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.example.catsapp.core.common.Resource
+import com.example.catsapp.core.data.mapper.toDomain
+import com.example.catsapp.core.data.paging.CatPagingSource
+import com.example.catsapp.core.data_api.repository.CatRepository
+import com.example.catsapp.core.model.Cat
+import com.example.catsapp.core.network.retrofit.CatApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import java.io.IOException
+import javax.inject.Inject
 
-class CatRepositoryImpl : TestRepository {}
+class CatRepositoryImpl @Inject constructor(
+    private val api: CatApi
+) : CatRepository {
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
+    override fun getCats(limit: Int): Flow<Resource<List<Cat>>> = flow {
+        emit(Resource.Loading)
+        try {
+            val response = api.getCatImages(limit)
+            val cats = response.map { it.toDomain() }
+            emit(Resource.Success(cats))
+        } catch (e: HttpException) {
+            emit(Resource.Error(e))
+        } catch (e: IOException) {
+            emit(Resource.Error(e))
+        }
+    }
+
+    override fun getCatsPaging(pageSize: Int): Flow<PagingData<Cat>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = pageSize,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { CatPagingSource(api) }
+        ).flow
+    }
+}
