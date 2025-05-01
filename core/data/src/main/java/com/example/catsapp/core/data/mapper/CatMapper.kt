@@ -7,26 +7,14 @@ import com.example.catsapp.core.network.response.CatResponse
 fun CatEntity.toDomain(): Cat =
     Cat(
         id = id,
-        url = url,
-        width = width,
-        height = height,
-        path = path,
+        remoteUrl = url,
+        localPath = filePath
     )
 
-fun Cat.toEntity(): CatEntity =
+fun CatResponse.toEntity(filePath: String?): CatEntity =
     CatEntity(
         id = id,
         url = url,
-        width = width,
-        height = height,
-        path = path,
-    )
-
-fun CatResponse.toDomain(): Cat =
-    Cat(
-        id = id,
-        url = url,
-        width = width,
-        height = height,
-        path = ""
+        filePath = filePath,
+        savedAt = System.currentTimeMillis()
     )

@@ -5,10 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "cats")
 data class CatEntity(
-    @PrimaryKey
-    val id: String,
+    @PrimaryKey val id: String,
     val url: String,
-    val width: Int,
-    val height: Int,
-    val path: String,
+    val filePath: String?,
+    val savedAt: Long,
 )
