@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.catsapp.feature.cats.navigation.CatsRoute
 import com.example.catsapp.feature.cats.navigation.catsScreen
+import com.example.catsapp.feature.cats.navigation.navigateToCatDetail
 
 @Composable
 fun MainNavHost(navController: NavHostController) {
@@ -12,6 +13,9 @@ fun MainNavHost(navController: NavHostController) {
         navController = navController,
         startDestination = CatsRoute
     ) {
-        catsScreen()
+        catsScreen(
+            navigateToCatDetail = navController::navigateToCatDetail,
+            navigateBack = navController::popBackStack
+        )
     }
 } 

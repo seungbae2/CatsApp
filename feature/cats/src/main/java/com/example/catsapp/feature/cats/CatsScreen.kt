@@ -2,6 +2,7 @@ package com.example.catsapp.feature.cats
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,19 +33,20 @@ import com.example.catsapp.core.model.Cat
 
 @Composable
 internal fun CatsRoute(
+    navigateToCatDetail: (String) -> Unit,
+    viewModel: CatsViewModel = hiltViewModel(),
 ) {
-    CatsScreen()
-}
-
-@Composable
-fun CatsScreen(viewModel: CatsViewModel = hiltViewModel()) {
     val catPagingItems = viewModel.catsPagingResult.collectAsLazyPagingItems()
-    CatsPagingGrid(catPagingItems)
+    CatsScreen(
+        catPagingItems = catPagingItems,
+        onCatClick = navigateToCatDetail
+    )
 }
 
 @Composable
-fun CatsPagingGrid(
+fun CatsScreen(
     catPagingItems: LazyPagingItems<Cat>,
+    onCatClick: (String) -> Unit,
 ) {
     // 화면 방향 감지
     val configuration = LocalConfiguration.current
@@ -62,7 +64,8 @@ fun CatsPagingGrid(
             ) { index ->
                 catPagingItems[index]?.let { cat ->
                     CatImageItem(
-                        model = cat.imageModel,      // File 또는 String
+                        model = cat.imageModel,
+                        onCatClick = { onCatClick(cat.id) }
                     )
                 }
             }
@@ -132,11 +135,16 @@ fun CatsPagingGrid(
 }
 
 @Composable
-fun CatImageItem(model: Any, modifier: Modifier = Modifier) {
+fun CatImageItem(
+    model: Any,
+    modifier: Modifier = Modifier,
+    onCatClick: () -> Unit,
+) {
     Box(
         modifier = modifier
             .padding(4.dp)
             .aspectRatio(0.8f)
+            .clickable(onClick = onCatClick)
     ) {
         Image(
             painter = rememberAsyncImagePainter(

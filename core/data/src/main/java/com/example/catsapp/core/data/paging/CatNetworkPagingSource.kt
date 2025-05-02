@@ -2,14 +2,12 @@ package com.example.catsapp.core.data.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.catsapp.core.common.NetworkWatcher
 import com.example.catsapp.core.data.mapper.toDomain
 import com.example.catsapp.core.data.util.ImageCacheHelper
 import com.example.catsapp.core.database.dao.CatDao
 import com.example.catsapp.core.database.entity.CatEntity
 import com.example.catsapp.core.model.Cat
 import com.example.catsapp.core.network.retrofit.CatApi
-import com.example.catsapp.core.network.util.retryIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -20,7 +18,6 @@ class CatNetworkPagingSource @Inject constructor(
     private val catApi: CatApi,
     private val catDao: CatDao,
     private val imageCache: ImageCacheHelper,
-    private val networkWatcher: NetworkWatcher,
 ) : PagingSource<Int, Cat>() {
 
     override fun getRefreshKey(state: PagingState<Int, Cat>): Int? {
@@ -35,9 +32,7 @@ class CatNetworkPagingSource @Inject constructor(
         val loadSize = params.loadSize
 
         return try {
-            val catsResponse = retryIO {
-                catApi.getCatImages(loadSize)
-            }
+            val catsResponse = catApi.getCatImages(loadSize)
 
             val entities = catsResponse.map { dto ->
                 val path = imageCache.cache(dto.id, dto.url).path
@@ -59,7 +54,6 @@ class CatNetworkPagingSource @Inject constructor(
                 prevKey = if (page == 1) null else page - 1,
                 nextKey = if (entities.isEmpty()) null else page + 1
             )
-
         } catch (e: IOException) {
             // 네트워크 연결 문제나 타임아웃일 경우 → 로컬 DB fallback
             val fallback = withContext(Dispatchers.IO) {
