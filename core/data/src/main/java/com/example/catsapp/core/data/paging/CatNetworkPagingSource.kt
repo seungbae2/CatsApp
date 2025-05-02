@@ -56,8 +56,9 @@ class CatNetworkPagingSource @Inject constructor(
             )
         } catch (e: IOException) {
             // 네트워크 연결 문제나 타임아웃일 경우 → 로컬 DB fallback
+            val offset = (page - 1) * loadSize
             val fallback = withContext(Dispatchers.IO) {
-                catDao.getCats(random = true)
+                catDao.getRandomCatsPaginated(limit = loadSize, offset = offset)
             }
             LoadResult.Page(
                 data = fallback.map { it.toDomain() },
@@ -69,8 +70,9 @@ class CatNetworkPagingSource @Inject constructor(
             return when (e.code()) {
                 in 500..599 -> {
                     // 서버 오류 → fallback
+                    val offset = (page - 1) * loadSize
                     val fallback = withContext(Dispatchers.IO) {
-                        catDao.getCats(random = true)
+                        catDao.getRandomCatsPaginated(limit = loadSize, offset = offset)
                     }
                     LoadResult.Page(
                         data = fallback.map { it.toDomain() },

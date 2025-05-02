@@ -41,6 +41,15 @@ interface CatDao {
     @Query("SELECT COUNT(*) FROM cats")
     suspend fun count(): Int
 
+    @Query(
+        """
+        SELECT * FROM cats
+        ORDER BY RANDOM()
+        LIMIT :limit OFFSET :offset
+        """
+    )
+    suspend fun getRandomCatsPaginated(limit: Int, offset: Int): List<CatEntity>
+
     @Query("DELETE FROM cats")
     suspend fun clearAll()
 } 
