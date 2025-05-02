@@ -1,7 +1,6 @@
 package com.example.catsapp.core.domain.usecase
 
 import androidx.paging.PagingData
-import com.example.catsapp.core.common.Resource
 import com.example.catsapp.core.model.Cat
 import com.example.catsapp.core.data_api.repository.CatRepository
 import kotlinx.coroutines.flow.Flow

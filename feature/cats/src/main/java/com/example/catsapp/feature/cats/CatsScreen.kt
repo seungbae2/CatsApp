@@ -2,7 +2,15 @@ package com.example.catsapp.feature.cats
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -10,21 +18,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.example.catsapp.core.model.Cat
 
 @Composable
@@ -41,13 +44,13 @@ fun CatsScreen(viewModel: CatsViewModel = hiltViewModel()) {
 
 @Composable
 fun CatsPagingGrid(
-    catPagingItems: LazyPagingItems<Cat>
+    catPagingItems: LazyPagingItems<Cat>,
 ) {
     // 화면 방향 감지
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val columnCount = if (isLandscape) 3 else 1
-    
+
     Box(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(columnCount),
@@ -58,10 +61,12 @@ fun CatsPagingGrid(
                 count = catPagingItems.itemCount
             ) { index ->
                 catPagingItems[index]?.let { cat ->
-                    CatImageItem(cat.url)
+                    CatImageItem(
+                        model = cat.imageModel,      // File 또는 String
+                    )
                 }
             }
-            
+
             item(span = { GridItemSpan(columnCount) }) {
                 when (val loadState = catPagingItems.loadState.append) {
                     is LoadState.Loading -> {
@@ -74,6 +79,7 @@ fun CatsPagingGrid(
                             CircularProgressIndicator()
                         }
                     }
+
                     is LoadState.Error -> {
                         Box(
                             modifier = Modifier
@@ -92,11 +98,12 @@ fun CatsPagingGrid(
                             }
                         }
                     }
+
                     else -> {}
                 }
             }
         }
-        
+
         // 초기 로딩 상태 처리
         when (catPagingItems.loadState.refresh) {
             is LoadState.Loading -> {
@@ -104,6 +111,7 @@ fun CatsPagingGrid(
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
+
             is LoadState.Error -> {
                 val error = catPagingItems.loadState.refresh as LoadState.Error
                 Column(
@@ -117,13 +125,14 @@ fun CatsPagingGrid(
                     }
                 }
             }
+
             else -> {}
         }
     }
 }
 
 @Composable
-fun CatImageItem(imageUrl: String, modifier: Modifier = Modifier) {
+fun CatImageItem(model: Any, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .padding(4.dp)
@@ -131,9 +140,8 @@ fun CatImageItem(imageUrl: String, modifier: Modifier = Modifier) {
     ) {
         Image(
             painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current)
-                    .data(imageUrl)
-                    .build()
+                model = model,
+                contentScale = ContentScale.Fit,
             ),
             contentDescription = "고양이 이미지",
             modifier = Modifier.fillMaxSize(),

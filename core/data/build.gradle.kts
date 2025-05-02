@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.catsapp.android.library)
     alias(libs.plugins.catsapp.hilt)
+    alias(libs.plugins.catsapp.android.room)
     id("kotlinx-serialization")
 }
 

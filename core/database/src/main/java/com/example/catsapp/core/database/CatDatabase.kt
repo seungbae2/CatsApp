@@ -7,7 +7,7 @@ import com.example.catsapp.core.database.entity.CatEntity
 
 @Database(
     entities = [
-        CatEntity::class
+        CatEntity::class,
     ],
     version = 1,
     exportSchema = true
