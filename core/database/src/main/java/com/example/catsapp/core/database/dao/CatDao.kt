@@ -24,6 +24,16 @@ interface CatDao {
     )
     fun pagingSource(random: Boolean = true): PagingSource<Int, CatEntity>
 
+    @Query(
+        """
+        SELECT * FROM cats
+        ORDER BY 
+            CASE WHEN :random = 1 THEN RANDOM() ELSE id END
+        LIMIT 10
+        """
+    )
+    fun getCats(random: Boolean = true): List<CatEntity>
+
     @Query("SELECT COUNT(*) FROM cats")
     suspend fun count(): Int
 

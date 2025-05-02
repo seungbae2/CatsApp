@@ -11,6 +11,13 @@ fun CatEntity.toDomain(): Cat =
         localPath = filePath
     )
 
+fun CatResponse.toDomain(filePath: String?): Cat =
+    Cat(
+        id = id,
+        remoteUrl = url,
+        localPath = filePath
+    )
+
 fun CatResponse.toEntity(filePath: String?): CatEntity =
     CatEntity(
         id = id,
