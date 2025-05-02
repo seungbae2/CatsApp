@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.catsapp.core.database.entity.CatEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CatDao {
@@ -33,6 +34,9 @@ interface CatDao {
         """
     )
     fun getCats(random: Boolean = true): List<CatEntity>
+
+    @Query("SELECT * FROM cats WHERE id = :id")
+    fun getCatById(id: String): Flow<CatEntity>
 
     @Query("SELECT COUNT(*) FROM cats")
     suspend fun count(): Int
