@@ -2,6 +2,7 @@ package com.example.catsapp.feature.cats
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,12 +16,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
@@ -37,6 +44,15 @@ internal fun CatsRoute(
     viewModel: CatsViewModel = hiltViewModel(),
 ) {
     val catPagingItems = viewModel.catsPagingResult.collectAsLazyPagingItems()
+    val isOnline by viewModel.networkWatcher.networkStatusFlow.collectAsState()
+
+    // 온라인 전환이 감지되면 retry() 호출
+    LaunchedEffect(isOnline) {
+        if (isOnline) {
+            catPagingItems.retry()
+        }
+    }
+
     CatsScreen(
         catPagingItems = catPagingItems,
         onCatClick = navigateToCatDetail
@@ -64,6 +80,7 @@ fun CatsScreen(
             ) { index ->
                 catPagingItems[index]?.let { cat ->
                     CatImageItem(
+                        index = index,
                         model = cat.imageModel,
                         onCatClick = { onCatClick(cat.id) }
                     )
@@ -136,6 +153,7 @@ fun CatsScreen(
 
 @Composable
 fun CatImageItem(
+    index: Int,
     model: Any,
     modifier: Modifier = Modifier,
     onCatClick: () -> Unit,
@@ -146,6 +164,7 @@ fun CatImageItem(
             .aspectRatio(0.8f)
             .clickable(onClick = onCatClick)
     ) {
+
         Image(
             painter = rememberAsyncImagePainter(
                 model = model,
@@ -155,5 +174,20 @@ fun CatImageItem(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit
         )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+
+            Text(
+                text = "Index: ${index + 1}",
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .background(Color.Gray.copy(alpha = 0.6f), shape = CircleShape)
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            )
+        }
     }
 }

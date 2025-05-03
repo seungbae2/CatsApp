@@ -3,6 +3,7 @@ package com.example.catsapp.core.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.example.catsapp.core.common.NetworkWatcher
 import com.example.catsapp.core.data.mapper.toDomain
 import com.example.catsapp.core.data.paging.CatNetworkPagingSource
 import com.example.catsapp.core.data.util.ImageCacheHelper
@@ -20,6 +21,7 @@ class CatRepositoryImpl @Inject constructor(
     private val api: CatApi,
     private val dao: CatDao,
     private val imageCacheHelper: ImageCacheHelper,
+    private val networkWatcher: NetworkWatcher,
 ) : CatRepository {
 
     override fun getCatsPaging(pageSize: Int): Flow<PagingData<Cat>> =
@@ -30,9 +32,24 @@ class CatRepositoryImpl @Inject constructor(
                     catApi = api,
                     catDao = dao,
                     imageCache = imageCacheHelper,
+                    networkWatcher = networkWatcher,
                 )
             }
         ).flow
+
+//    @OptIn(ExperimentalPagingApi::class)
+//    override fun getCatsPaging(pageSize: Int): Flow<PagingData<Cat>> =
+//        Pager(
+//            config = PagingConfig(pageSize = pageSize),
+//            remoteMediator = CatRemoteMediator(
+//                api = api,
+//                dao = dao,
+//                cache = imageCacheHelper,
+//            ),
+//            pagingSourceFactory = { dao.pagingSource() }
+//        )
+//            .flow
+//            .map { paging -> paging.map { it.toDomain() } }
 
     override fun getCatById(id: String): Flow<Cat> =
         dao.getCatById(id = id)
