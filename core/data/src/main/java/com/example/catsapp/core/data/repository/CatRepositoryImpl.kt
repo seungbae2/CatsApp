@@ -13,8 +13,7 @@ import com.example.catsapp.core.model.Cat
 import com.example.catsapp.core.network.retrofit.CatApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CatRepositoryImpl @Inject constructor(
@@ -51,8 +50,8 @@ class CatRepositoryImpl @Inject constructor(
 //            .flow
 //            .map { paging -> paging.map { it.toDomain() } }
 
-    override fun getCatById(id: String): Flow<Cat> =
-        dao.getCatById(id = id)
-            .map { it.toDomain() }
-            .flowOn(Dispatchers.IO)
+    override suspend fun getCatById(id: String): Cat = withContext(Dispatchers.IO) {
+        dao.getCatById(id = id).toDomain()
+    }
+
 }

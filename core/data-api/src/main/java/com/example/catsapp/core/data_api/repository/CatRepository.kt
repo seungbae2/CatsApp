@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface CatRepository {
     fun getCatsPaging(pageSize: Int): Flow<PagingData<Cat>>
 
-    fun getCatById(id: String): Flow<Cat>
+    suspend fun getCatById(id: String): Cat
 }

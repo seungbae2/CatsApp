@@ -133,10 +133,15 @@ fun ZoomableImage(
 ) {
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
-    var composableSize by remember { mutableStateOf(IntSize.Zero) }
+//    var composableSize by remember { mutableStateOf(IntSize.Zero) }
 
     BoxWithConstraints(modifier = modifier) {
-        composableSize = IntSize(constraints.maxWidth, constraints.maxHeight)
+        val maxWidth = this.maxWidth.value
+        val maxHeight = this.maxHeight.value
+        val composableSize = remember {
+            IntSize(maxWidth.toInt(), maxHeight.toInt())
+        }
+//        composableSize = IntSize(constraints.maxWidth, constraints.maxHeight)
 
         Box(
             Modifier

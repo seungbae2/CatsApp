@@ -26,9 +26,12 @@ class CatDetailViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getCatByIdUseCase.invoke(catId).collect {
-                _catDetailUiState.value = CatDetailUiState.Success(it)
-            }
+            _catDetailUiState.value =
+                CatDetailUiState.Success(cat = getCatByIdUseCase.invoke(catId))
+
+//            getCatByIdUseCase.invoke(catId) {
+//
+//            }
         }
     }
 }

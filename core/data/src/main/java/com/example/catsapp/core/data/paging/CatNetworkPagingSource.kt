@@ -48,7 +48,7 @@ class CatNetworkPagingSource @Inject constructor(
         }
 
         return try {
-            val catsResponse = catApi.getCatImages(loadSize)
+            val catsResponse = withContext(Dispatchers.IO) { catApi.getCatImages(loadSize) }
 
             val entities = catsResponse.map { dto ->
                 val path = imageCache.cache(dto.id, dto.url).path
