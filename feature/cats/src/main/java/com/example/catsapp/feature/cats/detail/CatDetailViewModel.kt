@@ -25,13 +25,18 @@ class CatDetailViewModel @Inject constructor(
     val catDetailUiState: StateFlow<CatDetailUiState> = _catDetailUiState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            _catDetailUiState.value =
-                CatDetailUiState.Success(cat = getCatByIdUseCase.invoke(catId))
+        loadCatDetail()
+    }
 
-//            getCatByIdUseCase.invoke(catId) {
-//
-//            }
+    fun loadCatDetail() {
+        viewModelScope.launch {
+            _catDetailUiState.value = CatDetailUiState.Loading
+            try {
+                val cat = getCatByIdUseCase.invoke(catId)
+                _catDetailUiState.value = CatDetailUiState.Success(cat)
+            } catch (e: Exception) {
+                _catDetailUiState.value = CatDetailUiState.Error(e)
+            }
         }
     }
 }

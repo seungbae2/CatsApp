@@ -3,15 +3,22 @@ package com.example.catsapp.feature.cats.detail
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +53,8 @@ internal fun CatDetailRoute(
     val catDetailUiState: CatDetailUiState by viewModel.catDetailUiState.collectAsState()
     CatDetailScreen(
         catDetailUiState = catDetailUiState,
-        navigateBack = navigateBack
+        navigateBack = navigateBack,
+        onRetry = viewModel::loadCatDetail
     )
 }
 
@@ -54,10 +62,11 @@ internal fun CatDetailRoute(
 fun CatDetailScreen(
     catDetailUiState: CatDetailUiState,
     navigateBack: () -> Unit,
+    onRetry: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
         when (catDetailUiState) {
             is CatDetailUiState.Loading -> {
@@ -70,8 +79,66 @@ fun CatDetailScreen(
             }
 
             is CatDetailUiState.Error -> {
-                Text("이미지를 찾을 수 없습니다: ${catDetailUiState.throwable.localizedMessage}")
+                ErrorContent(
+                    message = catDetailUiState.throwable.localizedMessage ?: "알 수 없는 오류",
+                    onRetry = onRetry,
+                    onBack = navigateBack
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun ErrorContent(
+    message: String,
+    onRetry: () -> Unit,
+    onBack: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Warning,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.error
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "이미지를 불러올 수 없습니다",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Button(onClick = onRetry) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Text("다시 시도")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = onBack) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Text("뒤로가기")
         }
     }
 }
