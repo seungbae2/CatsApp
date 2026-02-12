@@ -1,159 +1,86 @@
 # CatsApp
 
-CatsApp is an Android application that displays and manages a collection of cat images.  
-It focuses on clean architecture, modularization, and a resilient paging strategy that provides a
-smooth user experience even under unstable network conditions.
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Development & Runtime Environment](#development--runtime-environment)
-- [Key Features](#key-features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Module Dependencies](#module-dependencies)
-- [Layer Responsibilities & Modules](#layer-responsibilities--modules)
-- [Data Flow](#data-flow)
-- [Why PagingSource Instead of RemoteMediator](#why-pagingsource-instead-of-remotemediator)
-
----
-
-## Project Overview
-
-CatsApp displays cat images using a paginated grid layout.  
-Users can scroll infinitely through cat images and select a specific image to view detailed
-information.
-
-The app monitors network connectivity and optimizes the user experience by gracefully falling back
-to locally cached data when offline.
-
----
-
-## Development & Runtime Environment
-
-- **Operating Systems**: macOS, Windows, Linux
-- **Android Studio**: Meerkat | 2024.3.1 Patch 2
-- **Kotlin**: 2.1.10
-- **Java**: 17
-- **Min SDK**: 26
-- **Target SDK**: 35
-- **Gradle**: 8.9.0
-
----
+An Android application that displays and manages a collection of cat images. Built with Clean
+Architecture, multi-module structure, and a resilient paging strategy that provides a smooth user
+experience even under unstable network conditions.
 
 ## Key Features
 
-### 1. Cat Image List
-
-- Infinite scrolling with Paging 3
-- Grid-based image layout
-
-### 2. Cat Detail View
-
-- Full-screen image display
-- Detailed information for each cat image
-
-### 3. Network State Handling
-
-- Offline state detection
-- Automatic retry when network connectivity is restored
-
-### 4. Orientation Optimization
-
-- Supports both portrait and landscape modes
-- 3-column grid layout in landscape mode
-
----
+- **Infinite Scrolling** — Paginated cat image grid using Paging 3
+- **Detail View** — Full-screen image display with metadata
+- **Offline Support** — Automatic fallback to cached data when network is unavailable, with
+  auto-retry on reconnection
+- **Orientation Aware** — Responsive grid layout (2-column portrait, 3-column landscape)
 
 ## Tech Stack
 
-| Category             | Technology               |
-|----------------------|--------------------------|
-| Language             | Kotlin                   |
-| UI                   | Jetpack Compose          |
-| Architecture         | MVVM, Clean Architecture |
-| Async                | Coroutines, Flow         |
-| Networking           | Retrofit                 |
-| Image Loading        | Coil                     |
-| Dependency Injection | Hilt                     |
-| Paging               | Paging 3                 |
-| Navigation           | Navigation Compose       |
-| Logging              | Timber                   |
+| Category      | Technology               |
+|---------------|--------------------------|
+| Language      | Kotlin                   |
+| UI            | Jetpack Compose          |
+| Architecture  | MVVM, Clean Architecture |
+| Async         | Coroutines, Flow         |
+| Networking    | Retrofit                 |
+| Image Loading | Coil                     |
+| DI            | Hilt                     |
+| Pagination    | Paging 3                 |
+| Navigation    | Navigation Compose       |
+| Logging       | Timber                   |
 
----
+## Architecture
 
-## Project Structure
-
-```
-CatsApp/
-├── app/
-├── build-logic/
-├── core/
-│   ├── common/
-│   ├── data/
-│   ├── data-api/
-│   ├── database/
-│   ├── domain/
-│   ├── model/
-│   ├── network/
-│   └── ui/
-└── feature/
-    └── cats/
-```
-
----
-
-## Module Dependencies
+The app follows Clean Architecture with multi-module separation:
 
 ```
-core:network ─┐
-              ├─> core:data ──> core:data-api <── core:domain <── feature:cats
-core:database ─┘
-core:common ────────────────────────────────────────────────┘
-app (Shell)
+app/                  → Application shell
+build-logic/          → Convention plugins for Gradle
+core/
+├── common/           → Shared utilities
+├── data/             → Repository implementations
+├── data-api/         → Repository interfaces
+├── database/         → Room local database
+├── domain/           → Use cases & business logic
+├── model/            → Domain models
+├── network/          → Retrofit API clients
+└── ui/               → Shared UI components
+feature/
+└── cats/             → Cat list & detail screens
 ```
 
----
+### Data Flow
 
-## Layer Responsibilities & Modules
+Uses **PagingSource** (not RemoteMediator) to centralize control over network-to-database caching,
+offline fallback, and retry logic. This approach simplifies flow management and handles mid-session
+connectivity changes gracefully.
 
-### Presentation Layer
+```
+UI (Compose) → ViewModel → UseCase → Repository → PagingSource
+                                                    ├── Network (API)
+                                                    └── Local (Room DB)
+```
 
-- **app**: Application shell and navigation
-- **feature:cats**: Cat list & detail UI
-- **core:ui**: Shared UI components
+## How to Build
 
-### Domain Layer
+### Requirements
 
-- **core:model**: Domain models
-- **core:domain**: Business logic & use cases
+- Android Studio Meerkat | 2024.3.1 Patch 2+
+- JDK 17
+- Min SDK 26 / Target SDK 35
 
-### Data Layer
+### Steps
 
-- **core:data**: Repository implementations
-- **core:data-api**: Repository interfaces
-- **core:network**: Remote API
-- **core:database**: Local DB
+```bash
+git clone https://github.com/seungbae2/CatsApp.git
+cd CatsApp
+```
 
-### Common Layer
+Open in Android Studio and sync Gradle. Run on emulator or device (API 26+).
 
-- **core:common**: Network monitoring utilities
+## Design Decisions
 
----
-
-## Data Flow
-
-Uses PagingSource with network-first strategy and local DB fallback.
-
----
-
-## Why PagingSource Instead of RemoteMediator
-
-PagingSource allows centralized control of:
-
-- Network → DB caching
-- Offline fallback
-- Retry behavior on network recovery
-
-This results in simpler flow control and better handling of mid-session network changes compared to
-RemoteMediator.
+- **PagingSource over RemoteMediator**: Provides simpler control flow for offline-first pagination
+  with network recovery
+- **Multi-module structure**: Enforces dependency rules at compile time — feature modules cannot
+  access each other directly
+- **Convention Plugins**: Centralized build configuration via `build-logic` module reduces
+  duplication across modules
